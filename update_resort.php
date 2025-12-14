@@ -9,10 +9,26 @@ if ($conn->connect_error) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = intval($_POST['id']);
-    $title = $_POST['title'];
-    $location = $_POST['location'];
-    $price = $_POST['price'];
-    $description = $_POST['description'];
+    $title = $conn->real_escape_string($_POST['title']);
+    $location = $conn->real_escape_string($_POST['location']);
+    $price = $conn->real_escape_string($_POST['price']);
+    $description = $conn->real_escape_string($_POST['description']);
+    
+    $room_count = isset($_POST['room_count']) ? intval($_POST['room_count']) : 0;
+    $rooms_array = [];
+    if ($room_count > 0) {
+        for ($i = 1; $i <= $room_count; $i++) {
+            $rooms_array[] = [
+                "room" => (string)$i,
+                "availability" => true
+            ];
+        }
+    }
+    $rooms_json = $conn->real_escape_string(json_encode($rooms_array));
+
+    $amenities_input = isset($_POST['amenities']) ? $_POST['amenities'] : '';
+    $amenities_array = array_map('trim', explode(',', $amenities_input));
+    $amenities_json = $conn->real_escape_string(json_encode($amenities_array));
 
     $imagePath = null;
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
@@ -23,11 +39,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
     }
+
     $sql = "UPDATE resort SET 
             title = '$title', 
             location = '$location', 
             price = '$price', 
-            description = '$description'";
+            description = '$description',
+            rooms = '$rooms_json',
+            amenities = '$amenities_json'";
     
     if ($imagePath) {
         $sql .= ", image = '$imagePath'";

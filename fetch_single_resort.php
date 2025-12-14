@@ -9,7 +9,7 @@ if ($conn->connect_error) {
 
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']);
-    $sql = "SELECT id, title, location, description, status, price, image FROM resort WHERE id = $id";
+    $sql = "SELECT id, title, location, description, status, price, image, rooms, amenities FROM resort WHERE id = $id";
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {

@@ -58,12 +58,79 @@ session_start();
 				width: 150px;
 			}
 
+            /* --- Added Styles for Booking Modal --- */
+            .modal {
+                display: none; 
+                position: fixed; 
+                z-index: 9999; 
+                left: 0; 
+                top: 0; 
+                width: 100%; 
+                height: 100%; 
+                overflow: auto; 
+                background-color: rgba(0,0,0,0.6); 
+            }
+            .modal-content {
+                background-color: #fefefe;
+                margin: 5% auto; 
+                padding: 25px;
+                border: 1px solid #888;
+                width: 80%;
+                max-width: 900px;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                font-family: 'PT Sans Narrow', sans-serif;
+            }
+            .close-modal {
+                color: #aaa;
+                float: right;
+                font-size: 28px;
+                font-weight: bold;
+                cursor: pointer;
+            }
+            .close-modal:hover, .close-modal:focus {
+                color: #000;
+                text-decoration: none;
+                cursor: pointer;
+            }
+            .booking-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+            .booking-table th, .booking-table td {
+                border: 1px solid #ddd;
+                padding: 12px;
+                text-align: left;
+                font-size: 16px;
+            }
+            .booking-table th {
+                background-color: #454545;
+                color: white;
+                text-transform: uppercase;
+            }
+            .booking-table tr:nth-child(even) {background-color: #f2f2f2;}
+            
+            .btn-cancel {
+                background-color: #dc3545;
+                color: white;
+                border: none;
+                padding: 6px 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-family: 'PT Sans Narrow', sans-serif;
+                text-transform: uppercase;
+                transition: background 0.3s;
+            }
+            .btn-cancel:hover { background-color: #c82333; }
+            
+            .status-canceled { color: red; font-weight: bold; }
+            .status-active { color: green; font-weight: bold; }
+
 		  </style>
 	</head>
 	<body>
-		<!---start-Wrap--->
-			<!---start-header--->
-			<div class="header">
+		<div class="header">
 				<div class="wrap">
 					<div class="header-top">
 						<div class="logo">
@@ -100,26 +167,23 @@ session_start();
 							<li><a href="services.html">Services</a></li>
 							<li><a href="gallery.html">Gallery</a></li>
 							<li><a href="contact.html">Contact</a></li>
+                            <?php if (isset($_SESSION['user']) && $_SESSION['user']['role'] === 'customer'): ?>
+                                <li><a href="#" onclick="openBookingModal(); return false;">My Bookings</a></li>
+                            <?php endif; ?>
 							<div class="clear"> </div>
 						</ul>
 					</div>
 				</div>
 			</div>
-			<!---End-header--->
 			<div class="clear"> </div>
-			<!--start-image-slider---->
-					<div class="image-slider">
-						<!-- Slideshow 1 -->
-						    <ul class="rslides" id="slider1">
+			<div class="image-slider">
+						<ul class="rslides" id="slider1">
 						      <li><img src="images/slider3.jpg" alt=""></li>
 						      <li><img src="images/slider1.jpg" alt=""></li>
 						      <li><img src="images/slider3.jpg" alt=""></li>
 						    </ul>
-						 <!-- Slideshow 2 -->
-					</div>
-					<!--End-image-slider---->
-			<!---start-content----->
-			<div class="content">
+						 </div>
+					<div class="content">
 				<div class="quit">
 					<p><span class="start">Your </span> hotel's <span class="end">Motto .</span></p>
 				</div>
@@ -225,17 +289,105 @@ session_start();
 		
 				<div class="clear"> </div>
 			</div>
-			<!---start-box---->
-		</div>
-		<!---start-copy-Right----->
+			</div>
 		<div class="copy-tight">
 			<p>&copy HOTEL,Nepal 2017 "THIS PROJECT IS BROUGHT TO YOU BY <a href="http://www.code-projects.org/">CODE-PROJECTS"</a></p>
 		</div>
-		<!---End-copy-Right----->
-			</div>
-			<!---End-content----->
 		</div>
-		<!---End-Wrap--->
+			</div>
+		<div id="bookingModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal" onclick="closeBookingModal()">&times;</span>
+                <h2>My Bookings</h2>
+                <div id="bookingList">
+                    <p>Loading bookings...</p>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function openBookingModal() {
+                document.getElementById('bookingModal').style.display = 'block';
+                fetchBookings();
+            }
+
+            function closeBookingModal() {
+                document.getElementById('bookingModal').style.display = 'none';
+            }
+
+            window.onclick = function(event) {
+                var modal = document.getElementById('bookingModal');
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+
+            function fetchBookings() {
+                fetch('fetch_user_bookings.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        let html = '<table class="booking-table">';
+                        html += '<thead><tr><th>Room Type</th><th>Room No</th><th>Check In</th><th>Check Out</th><th>Price</th><th>Status</th><th>Action</th></tr></thead><tbody>';
+                        
+                        if (data.data.length > 0) {
+                            data.data.forEach(booking => {
+                                let statusClass = booking.status === 'canceled' ? 'status-canceled' : 'status-active';
+                                let actionBtn = '';
+                                if(booking.status !== 'canceled') {
+                                    actionBtn = `<button class="btn-cancel" onclick="cancelBooking(${booking.id})">Cancel</button>`;
+                                } else {
+                                    actionBtn = '<span>-</span>';
+                                }
+
+                                html += `<tr>
+                                    <td>${booking.title}</td>
+                                    <td>${booking.room_number ? booking.room_number : 'N/A'}</td>
+                                    <td>${booking.checkin}</td>
+                                    <td>${booking.checkout}</td>
+                                    <td>$${booking.price}</td>
+                                    <td class="${statusClass}">${booking.status.toUpperCase()}</td>
+                                    <td>${actionBtn}</td>
+                                </tr>`;
+                            });
+                        } else {
+                            html += '<tr><td colspan="7">No bookings found.</td></tr>';
+                        }
+                        html += '</tbody></table>';
+                        document.getElementById('bookingList').innerHTML = html;
+                    } else {
+                        document.getElementById('bookingList').innerHTML = '<p>' + data.message + '</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('bookingList').innerHTML = '<p>Error loading bookings.</p>';
+                });
+            }
+
+            function cancelBooking(id) {
+                if(!confirm("Are you sure you want to cancel this reservation?")) return;
+
+                fetch('cancel_booking.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ id: id })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    if(data.success) {
+                        fetchBookings();
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert("An error occurred while canceling.");
+                });
+            }
+        </script>
+
 	</body>
 </html>
-

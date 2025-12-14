@@ -75,6 +75,7 @@ session_start();
                 <tr>
                     <th>Book ID</th>
                     <th>Resort</th>
+                    <th>Room Number</th>
                     <th>Customer</th>
                     <th>Check In Date</th>
                     <th>Check Out Date</th>
@@ -201,6 +202,7 @@ function fetchBookings() {
                     row.innerHTML = `
                         <td>${booking.id}</td>
                         <td>${booking.title}</td>
+                        <td>${booking.room_number}</td>
                         <td>${booking.username}</td>
                         <td>${booking.checkin}</td>
                         <td>${booking.checkout}</td>

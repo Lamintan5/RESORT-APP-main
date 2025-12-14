@@ -10,7 +10,7 @@ if ($conn->connect_error) {
     exit();
 }
 
-$sql = "SELECT id, title, username, checkin, checkout, price, status FROM booking";
+$sql = "SELECT id, title, room_number, username, checkin, checkout, price, status FROM booking";
 $result = $conn->query($sql);
 
 $bookings = [];
