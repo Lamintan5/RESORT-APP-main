@@ -16,7 +16,7 @@ $username = isset($_SESSION['user']) ? $_SESSION['user']['username'] : null;
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f9; 
+            background-color: #f4f7f9;
             color: #333;
         }
 
@@ -32,7 +32,7 @@ $username = isset($_SESSION['user']) ? $_SESSION['user']['username'] : null;
             display: flex;
             justify-content: space-between;
             max-width: 1200px;
-            width: 90%; 
+            width: 90%;
             gap: 40px;
             margin-top: 30px;
             background-color: #fff;
@@ -55,7 +55,7 @@ $username = isset($_SESSION['user']) ? $_SESSION['user']['username'] : null;
             object-fit: cover;
             transition: transform 0.3s ease;
         }
-        
+
         .resort-image img:hover {
             transform: scale(1.03);
         }
@@ -89,7 +89,7 @@ $username = isset($_SESSION['user']) ? $_SESSION['user']['username'] : null;
         .resort-info span {
             font-weight: normal;
         }
-        
+
         #resortPrice {
             font-size: 1.3rem;
             font-weight: bold;
@@ -128,7 +128,7 @@ $username = isset($_SESSION['user']) ? $_SESSION['user']['username'] : null;
             gap: 15px;
             font-size: 1.1rem;
         }
-        
+
         .amenities-list li {
             background-color: #e6f0ff;
             padding: 8px 15px;
@@ -157,7 +157,7 @@ $username = isset($_SESSION['user']) ? $_SESSION['user']['username'] : null;
             transition: all 0.3s ease;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
-        
+
         .room-card.available {
             color: #1a73e8;
         }
@@ -183,7 +183,7 @@ $username = isset($_SESSION['user']) ? $_SESSION['user']['username'] : null;
             border-color: #c82333;
             box-shadow: none;
         }
-        
+
         #roomSelectionMessage {
             color: #dc3545 !important;
             font-weight: 500;
@@ -232,7 +232,7 @@ $username = isset($_SESSION['user']) ? $_SESSION['user']['username'] : null;
             box-sizing: border-box;
             transition: border-color 0.3s;
         }
-        
+
         .booking-container input:focus, .booking-container select:focus {
             border-color: #1a73e8;
             outline: none;
@@ -257,7 +257,49 @@ $username = isset($_SESSION['user']) ? $_SESSION['user']['username'] : null;
             background-color: #155cb0;
             transform: translateY(-1px);
         }
-        
+        .amenities-grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
+
+        .amenity-card {
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .amenity-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .amenity-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .amenity-content {
+            padding: 15px;
+        }
+
+        .amenity-title {
+            font-size: 1.2rem;
+            color: #1a73e8;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .amenity-desc {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
         @media (max-width: 900px) {
             .resort-container {
                 flex-direction: column;
@@ -272,6 +314,7 @@ $username = isset($_SESSION['user']) ? $_SESSION['user']['username'] : null;
                 height: 300px;
             }
         }
+
 
     </style>
 </head>
@@ -291,23 +334,34 @@ $username = isset($_SESSION['user']) ? $_SESSION['user']['username'] : null;
         </div>
     </div>
 
+<!--    <div class="details-section">-->
+<!--        <h3>Amenities</h3>-->
+<!--        <ul id="amenitiesList" class="amenities-list">-->
+<!--            </ul>-->
+<!---->
+<!--        <h3>Available Rooms (Select one to book)</h3>-->
+<!--        <div id="roomsGrid" class="rooms-grid">-->
+<!--            </div>-->
+<!---->
+<!--        <p id="roomSelectionMessage" style="color: red; margin-top: 15px;">Please select an available room to proceed with booking.</p>-->
+<!--    </div>-->
+
     <div class="details-section">
         <h3>Amenities</h3>
-        <ul id="amenitiesList" class="amenities-list">
-            </ul>
-        
+        <div id="amenitiesContainer" class="amenities-grid-container">
+        </div>
+
         <h3>Available Rooms (Select one to book)</h3>
-        <div id="roomsGrid" class="rooms-grid">
-            </div>
-        
+        <div id="roomsGrid" class="rooms-grid"></div>
+
         <p id="roomSelectionMessage" style="color: red; margin-top: 15px;">Please select an available room to proceed with booking.</p>
     </div>
 
     <div class="booking-container">
         <h3>Book Your Stay</h3>
         <form id="bookingForm" onsubmit="submitBooking(event)">
-            <input type="hidden" id="selectedRoomNumber" name="selectedRoomNumber"> 
-            
+            <input type="hidden" id="selectedRoomNumber" name="selectedRoomNumber">
+
             <div class="form-group">
                 <label for="checkInDate">Check-in Date:</label>
                 <input type="date" id="checkInDate" required>
@@ -348,13 +402,13 @@ async function fetchResortDetails() {
     try {
         const urlParams = new URLSearchParams(window.location.search);
         const resortId = urlParams.get('id');
-        
+
         const response = await fetch(`fetch_single_resort.php?id=${resortId}`);
         const data = await response.json();
 
         if (data.success) {
             const resort = data.data;
-            
+
             document.getElementById('resortImage').src = resort.image;
             document.getElementById('resortTitle').innerText = resort.title;
             document.getElementById('resortLocation').innerText = resort.location;
@@ -367,7 +421,7 @@ async function fetchResortDetails() {
             renderRooms(resort.rooms);
 
             document.getElementById('roomsGrid').addEventListener('click', handleRoomSelection);
-            
+
         } else {
             alert('Resort not found');
         }
@@ -379,14 +433,14 @@ async function fetchResortDetails() {
 function renderAmenities(amenitiesJson) {
     const amenitiesList = document.getElementById('amenitiesList');
     amenitiesList.innerHTML = '';
-    
+
     let amenities = [];
     try {
         amenities = JSON.parse(amenitiesJson);
     } catch (e) {
-        amenities = []; 
+        amenities = [];
     }
-    
+
     if (Array.isArray(amenities) && amenities.length > 0) {
         amenities.forEach(item => {
             if (item && item.trim() !== "") {
@@ -402,8 +456,8 @@ function renderAmenities(amenitiesJson) {
 
 function renderRooms(roomsJson) {
     const roomsGrid = document.getElementById('roomsGrid');
-    roomsGrid.innerHTML = ''; 
-    
+    roomsGrid.innerHTML = '';
+
     let rooms = [];
     try {
         rooms = JSON.parse(roomsJson);
@@ -415,11 +469,11 @@ function renderRooms(roomsJson) {
         rooms.forEach(room => {
             const card = document.createElement('div');
             card.classList.add('room-card');
-            card.dataset.roomNumber = room.room; 
+            card.dataset.roomNumber = room.room;
             card.innerText = `Room ${room.room}`;
 
             const isAvailable = (room.availability === true || room.availability === 'true');
-            
+
             if (isAvailable) {
                 card.classList.add('available');
                 card.dataset.status = 'available';
@@ -436,14 +490,14 @@ function renderRooms(roomsJson) {
 
 function handleRoomSelection(event) {
     const card = event.target.closest('.room-card');
-    if (!card || card.dataset.status === 'booked') return; 
+    if (!card || card.dataset.status === 'booked') return;
 
     document.querySelectorAll('.room-card.selected').forEach(el => {
         el.classList.remove('selected');
     });
 
     card.classList.add('selected');
-    selectedRoom = card.dataset.roomNumber; 
+    selectedRoom = card.dataset.roomNumber;
 
     document.getElementById('selectedRoomNumber').value = selectedRoom;
     document.getElementById('roomSelectionMessage').style.display = 'none';
@@ -452,8 +506,8 @@ function handleRoomSelection(event) {
 
 
 async function submitBooking(event) {
-    event.preventDefault(); 
-    
+    event.preventDefault();
+
     if (!selectedRoom) {
         alert("Please select an available room before booking.");
         return;
@@ -463,7 +517,7 @@ async function submitBooking(event) {
     const checkOutDate = document.getElementById('checkOutDate').value;
     const paymentMethod = document.getElementById('paymentMethod').value;
     const resortId = new URLSearchParams(window.location.search).get('id');
-    
+
     const formData = new FormData();
     formData.append('checkInDate', checkInDate);
     formData.append('checkOutDate', checkOutDate);
@@ -481,9 +535,9 @@ async function submitBooking(event) {
 
         if (result.success) {
             alert(result.message);
-            window.location.reload(); 
+            window.location.reload();
         } else {
-            alert(result.message); 
+            alert(result.message);
         }
     } catch (error) {
         console.error('Error submitting booking:', error);
@@ -492,6 +546,54 @@ async function submitBooking(event) {
 }
 
 window.onload = fetchResortDetails;
+
+
+function renderAmenities(amenitiesJson) {
+    const container = document.getElementById('amenitiesContainer');
+    container.innerHTML = '';
+
+    let amenities = [];
+    try {
+        if (typeof amenitiesJson === 'string') {
+            amenities = JSON.parse(amenitiesJson);
+        } else {
+            amenities = amenitiesJson;
+        }
+    } catch (e) {
+        console.error("Error parsing amenities JSON", e);
+        amenities = [];
+    }
+
+    if (Array.isArray(amenities) && amenities.length > 0) {
+        amenities.forEach(item => {
+            if (typeof item === 'object' && item !== null) {
+                const card = document.createElement('div');
+                card.classList.add('amenity-card');
+
+                card.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}" class="amenity-image">
+                    <div class="amenity-content">
+                        <div class="amenity-title">${item.name}</div>
+                        <div class="amenity-desc">${item.description}</div>
+                    </div>
+                `;
+                container.appendChild(card);
+            }
+            else if (typeof item === 'string') {
+                const card = document.createElement('div');
+                card.classList.add('amenity-card');
+                card.innerHTML = `
+                    <div class="amenity-content">
+                        <div class="amenity-title">${item}</div>
+                    </div>
+                `;
+                container.appendChild(card);
+            }
+        });
+    } else {
+        container.innerHTML = '<p>No amenities listed for this resort.</p>';
+    }
+}
 
 </script>
 

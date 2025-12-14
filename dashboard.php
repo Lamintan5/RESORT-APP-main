@@ -124,9 +124,6 @@ session_start();
                 <label for="room_count">Number of Rooms:</label>
                 <input type="number" id="room_count" name="room_count" placeholder="e.g. 10" min="1" required>
 
-                <label for="amenities">Amenities (Comma separated):</label>
-                <textarea id="amenities" name="amenities" placeholder="Wifi, Pool, Gym, Spa" rows="3" style="resize: none;" required></textarea>
-
                 <label for="price">Price Per Day:</label>
                 <input type="number" id="price" name="price" placeholder="Enter price per day" required>
 
@@ -162,6 +159,27 @@ session_start();
                 <textarea id="edit-description" name="description" placeholder="Description" rows="5" style="resize: none;" required></textarea>
                 
                 <button type="submit">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="addAmenityModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAmenityModal()">&times;</span>
+            <h3>Add Amenity</h3>
+            <form id="addAmenityForm">
+                <input type="hidden" id="amenity_resort_id" name="resort_id">
+
+                <label for="amenity_image">Amenity Image:</label>
+                <input type="file" id="amenity_image" name="amenity_image" accept="image/*" required>
+
+                <label for="amenity_name">Amenity Name:</label>
+                <input type="text" id="amenity_name" name="amenity_name" placeholder="e.g. Swimming Pool" required>
+
+                <label for="amenity_description">Description:</label>
+                <textarea id="amenity_description" name="amenity_description" placeholder="Describe the amenity..." rows="3" style="resize: none;" required></textarea>
+
+                <button type="submit">Add Amenity</button>
             </form>
         </div>
     </div>

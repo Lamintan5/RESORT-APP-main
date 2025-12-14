@@ -7,7 +7,7 @@ async function fetchResorts() {
         const result = await response.json();
         if (result.success) {
             const tableBody = document.querySelector('#resorts-table tbody');
-            tableBody.innerHTML = ''; // Clear existing rows
+            tableBody.innerHTML = '';
             result.data.forEach(resort => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -18,35 +18,36 @@ async function fetchResorts() {
                     <td>${resort.status}</td>
                     <td>${resort.price}</td>
                     <td>
-                        <button class="edit-btn" data-id="${resort.id}"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button class="delete-btn" data-id="${resort.id}"><i class="fa-solid fa-trash"></i></button>
+                        <button class="action-btn edit-btn" data-id="${resort.id}" title="Edit Resort"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button class="action-btn delete-btn" data-id="${resort.id}" title="Delete Resort"><i class="fa-solid fa-trash"></i></button>
+                        <button class="action-btn add-amenity-btn" data-id="${resort.id}" title="Add Amenity"><i class="fa-solid fa-plus"></i></button>
                     </td>
                 `;
                 tableBody.appendChild(row);
             });
 
+
             document.querySelector('#resorts-table').addEventListener('click', event => {
-                // Identify if the clicked element or its parent is the 'edit-btn'
-                const button = event.target.closest('.edit-btn');
-                if (button) {
-                    const id = button.getAttribute('data-id');
-                    if (id) {
-                        editResort(id);
-                    } else {
-                        console.error('Error: Edit button clicked, but no data-id attribute found.');
-                    }
+
+                const editBtn = event.target.closest('.edit-btn');
+                if (editBtn) {
+                    const id = editBtn.getAttribute('data-id');
+                    editResort(id);
+                }
+
+                const deleteBtn = event.target.closest('.delete-btn');
+                if (deleteBtn) {
+                    const id = deleteBtn.getAttribute('data-id');
+                    deleteResort(id);
+                }
+
+                const amenityBtn = event.target.closest('.add-amenity-btn');
+                if (amenityBtn) {
+                    const id = amenityBtn.getAttribute('data-id');
+                    openAmenityModal(id);
                 }
             });
-            
 
-            
-
-            document.querySelectorAll('.delete-btn').forEach(button => {
-                button.addEventListener('click', event => {
-                    const id = event.target.getAttribute('data-id');
-                    deleteResort(id);
-                });
-            });
         } else {
             alert(`Error fetching resorts: ${result.message}`);
         }
@@ -55,7 +56,6 @@ async function fetchResorts() {
     }
 }
 
-// Call fetchResorts on page load
 fetchResorts();
 
 function openModal() {
@@ -67,35 +67,59 @@ function closeModal() {
 }
 
 document.getElementById('addResortForm').addEventListener('submit', async function (e) {
-e.preventDefault();
-const formData = new FormData(this);
-try {
-    const response = await fetch('add_resort.php', {
-        method: 'POST',
-        body: formData,
-    });
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
+    e.preventDefault();
+    const formData = new FormData(this);
+    try {
+        const response = await fetch('add_resort.php', {
+            method: 'POST',
+            body: formData,
+        });
+        const result = await response.json();
+        if (result.success) {
+            alert('Resort added successfully');
+            closeModal();
+            fetchResorts();
+        } else {
+            alert(`Error: ${result.message}`);
+        }
+    } catch (error) {
+        console.error('Error adding Resort:', error);
     }
+});
 
-    const result = await response.json();
-    if (result.success) {
-        alert('Resort added successfully');
-        closeModal();
-        fetchResorts();
-    } else {
-        alert(`Error: ${result.message}`);
-    }
-} catch (error) {
-    console.error('Error adding Resort:', error);
-    alert('An error occurred. Please check the console for details.');
+function openAmenityModal(resortId) {
+    document.getElementById('amenity_resort_id').value = resortId;
+    document.getElementById('addAmenityModal').style.display = 'flex';
 }
+
+function closeAmenityModal() {
+    document.getElementById('addAmenityModal').style.display = 'none';
+    document.getElementById('addAmenityForm').reset();
+}
+
+document.getElementById('addAmenityForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+
+    try {
+        const response = await fetch('add_amenity.php', {
+            method: 'POST',
+            body: formData
+        });
+        const result = await response.json();
+        if(result.success) {
+            alert('Amenity added successfully!');
+            closeAmenityModal();
+        } else {
+            alert(`Error: ${result.message}`);
+        }
+    } catch (error) {
+        console.error('Error adding Amenity:', error);
+    }
 });
 
 async function deleteResort(id) {
     if (!confirm('Are you sure you want to delete this resort?')) return;
-
     try {
         const response = await fetch('delete_resort.php', {
             method: 'POST',
@@ -105,7 +129,7 @@ async function deleteResort(id) {
         const result = await response.json();
         if (result.success) {
             alert('Resort deleted successfully');
-            fetchResorts(); // Refresh the table
+            fetchResorts();
         } else {
             alert(`Error deleting resort: ${result.message}`);
         }
@@ -114,19 +138,12 @@ async function deleteResort(id) {
     }
 }
 
-
-// Editing 
-
-
 function openEditModal(resort) {
-    // Pre-fill the form with resort data
     document.getElementById('edit-id').value = resort.id;
     document.getElementById('edit-title').value = resort.title;
     document.getElementById('edit-location').value = resort.location;
     document.getElementById('edit-price').value = resort.price;
     document.getElementById('edit-description').value = resort.description;
-
-    // Open the modal
     document.getElementById('editResortModal').style.display = 'flex';
 }
 
@@ -136,39 +153,28 @@ function closeEditModal() {
 
 document.getElementById('editResortForm').addEventListener('submit', async function (e) {
     e.preventDefault();
-
     const formData = new FormData(this);
     try {
         const response = await fetch('update_resort.php', {
             method: 'POST',
             body: formData,
         });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
         const result = await response.json();
         if (result.success) {
             alert('Resort updated successfully');
             closeEditModal();
-            fetchResorts(); // Refresh the table
+            fetchResorts();
         } else {
             alert(`Error: ${result.message}`);
         }
     } catch (error) {
         console.error('Error updating resort:', error);
-        alert('An error occurred. Please check the console for details.');
     }
 });
 
-// Edit button click handler
 async function editResort(id) {
     try {
         const response = await fetch(`fetch_single_resort.php?id=${id}`);
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
         const result = await response.json();
         if (result.success) {
             openEditModal(result.data);
@@ -179,4 +185,3 @@ async function editResort(id) {
         console.error('Error fetching resort details:', error);
     }
 }
-

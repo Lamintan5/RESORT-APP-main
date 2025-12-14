@@ -34,7 +34,6 @@ $price = $_POST['price'];
 $description = $_POST['description'];
 
 $room_count = isset($_POST['room_count']) ? intval($_POST['room_count']) : 0;
-$amenities_input = isset($_POST['amenities']) ? $_POST['amenities'] : '';
 
 if (empty($title) || empty($location) || empty($price) || empty($description) || $room_count < 1) {
     echo json_encode(['success' => false, 'message' => 'All fields are required, and room count must be at least 1']);
@@ -44,20 +43,19 @@ if (empty($title) || empty($location) || empty($price) || empty($description) ||
 $rooms_array = [];
 for ($i = 1; $i <= $room_count; $i++) {
     $rooms_array[] = [
-        "room" => (string)$i, 
+        "room" => (string)$i,
         "availability" => true
     ];
 }
 $rooms_json = json_encode($rooms_array);
 
-$amenities_array = array_map('trim', explode(',', $amenities_input));
-$amenities_json = json_encode($amenities_array);
+$amenities_json = json_encode([]);
 
 $title = $conn->real_escape_string($title);
 $location = $conn->real_escape_string($location);
 $description = $conn->real_escape_string($description);
 $imagePath = $conn->real_escape_string($imagePath);
-$rooms_json = $conn->real_escape_string($rooms_json); 
+$rooms_json = $conn->real_escape_string($rooms_json);
 $amenities_json = $conn->real_escape_string($amenities_json);
 
 $sql = "INSERT INTO resort (image, title, location, price, status, description, rooms, amenities) 
