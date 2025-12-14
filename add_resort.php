@@ -28,49 +28,38 @@ if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
     exit();
 }
 
-// 2. Receive Basic Data
 $title = $_POST['title'];
 $location = $_POST['location'];
 $price = $_POST['price'];
 $description = $_POST['description'];
 
-// 3. Receive New Data
 $room_count = isset($_POST['room_count']) ? intval($_POST['room_count']) : 0;
 $amenities_input = isset($_POST['amenities']) ? $_POST['amenities'] : '';
 
-// Validation
 if (empty($title) || empty($location) || empty($price) || empty($description) || $room_count < 1) {
     echo json_encode(['success' => false, 'message' => 'All fields are required, and room count must be at least 1']);
     exit();
 }
 
-// 4. GENERATE ROOMS JSON ARRAY
-// Logic: Loop from 1 to room_count creating the specific object structure requested
 $rooms_array = [];
 for ($i = 1; $i <= $room_count; $i++) {
     $rooms_array[] = [
-        "room" => (string)$i, // Storing as string "1" as requested
+        "room" => (string)$i, 
         "availability" => true
     ];
 }
-$rooms_json = json_encode($rooms_array); // Convert array to JSON string
+$rooms_json = json_encode($rooms_array);
 
-// 5. GENERATE AMENITIES JSON ARRAY
-// Logic: Split the input string by commas, trim whitespace, and encode as JSON
 $amenities_array = array_map('trim', explode(',', $amenities_input));
-$amenities_json = json_encode($amenities_array); // Convert to JSON string (e.g., ["Wifi", "Pool"])
+$amenities_json = json_encode($amenities_array);
 
-// Escape strings for SQL safety
 $title = $conn->real_escape_string($title);
 $location = $conn->real_escape_string($location);
 $description = $conn->real_escape_string($description);
 $imagePath = $conn->real_escape_string($imagePath);
-// json_encode handles quotes safely, but good practice to escape before query insertion just in case
 $rooms_json = $conn->real_escape_string($rooms_json); 
 $amenities_json = $conn->real_escape_string($amenities_json);
 
-// 6. SQL INSERT
-// Added 'rooms' and 'amenities' columns
 $sql = "INSERT INTO resort (image, title, location, price, status, description, rooms, amenities) 
         VALUES ('$imagePath', '$title', '$location', '$price', 'available', '$description', '$rooms_json', '$amenities_json')";
 
