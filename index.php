@@ -139,7 +139,7 @@ session_start();
 						<div class="contact-info">
 							<p class="phone">Call us : <a href="#">980XXXXXXX</a></p>
 							<p class="gpa">Gpa : <a href="#">View map</a></p>
-							<p class="code">BROUGHT TO YOU BY: <a href="https:www.code-projects.org">CODE-PROJECTS</a></p>
+							<p class="code">BROUGHT TO YOU BY: <a href="https:www.BANTU RESORT.org">BANTU RESORT</a></p>
 							<?php if (isset($_SESSION['user'])): ?>
 								<a href="logout.php" class="btn-talk">
 									<i class="fas fa-sign-out-alt"></i> Log out
@@ -278,12 +278,12 @@ session_start();
 				</div>
 				<div class="box center-box">
 					<ul>
-						<li><a href="https:www.code-projects.org">Leave a Feedback</a></li>
-						<li><a href="https:www.code-projects.org">Reviews and Ratings</a></li>
-						<li><a href="https:www.code-projects.org">FAQs</a></li>
-						<li><a href="https:www.code-projects.org">Packages</a></li>
-						<li><a href="https:www.code-projects.org">Know about Moutaineering and trekking here</a></li>
-						<li><a href="https:www.code-projects.org">www.code-projects.org</a></li>
+						<li><a href="https:www.BANTU RESORT.org">Leave a Feedback</a></li>
+						<li><a href="https:www.BANTU RESORT.org">Reviews and Ratings</a></li>
+						<li><a href="https:www.BANTU RESORT.org">FAQs</a></li>
+						<li><a href="https:www.BANTU RESORT.org">Packages</a></li>
+						<li><a href="https:www.BANTU RESORT.org">Know about Moutaineering and trekking here</a></li>
+						<li><a href="https:www.BANTU RESORT.org">www.BANTU RESORT.org</a></li>
 					</ul>
 				</div>
 		
@@ -291,7 +291,7 @@ session_start();
 			</div>
 			</div>
 		<div class="copy-tight">
-			<p>&copy HOTEL,Nepal 2017 "THIS PROJECT IS BROUGHT TO YOU BY <a href="http://www.code-projects.org/">CODE-PROJECTS"</a></p>
+			<p>&copy HOTEL,Nepal 2017 "THIS PROJECT IS BROUGHT TO YOU BY <a href="http://www.BANTU RESORT.org/">BANTU RESORT"</a></p>
 		</div>
 		</div>
 			</div>
